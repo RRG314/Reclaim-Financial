@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reclaim Financial - Platform Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f7fa;
+            color: #0f1419;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e1e8ed;
+            padding: 20px 40px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            height: 60px;
+            width: auto;
+        }
+
+        .header-info {
+            text-align: right;
+        }
+
+        .balance-display {
+            font-size: 14px;
+            color: #536471;
+            margin-bottom: 4px;
+        }
+
+        .balance-amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d5f8d;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            background: white;
+            border-bottom: 1px solid #e1e8ed;
+            padding: 0 40px;
+        }
+
+        .nav-tabs-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0;
+        }
+
+        .nav-tab {
+            padding: 16px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: #536471;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: #2d5f8d;
+            background: #f8fafc;
+        }
+
+        .nav-tab.active {
+            color: #2d5f8d;
+            border-bottom-color: #2d5f8d;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Grid Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #0f1419;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f1419;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cfd9de;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2d5f8d;
+            box-shadow: 0 0 0 3px rgba(45, 95, 141, 0.1);
+        }
+
+        .amount-input-wrapper {
+            position: relative;
+        }
+
+        .amount-input-wrapper::before {
+            content: "$";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            font-weight: 600;
+            color: #536471;
+        }
+
+        .amount-input-wrapper input {
+            padding-left: 28px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Payment Methods Grid */
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .payment-option {
+            padding: 16px;
+            border: 2px solid #cfd9de;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .payment-option:hover {
+            border-color: #2d5f8d;
+            background: #f8fafc;
+        }
+
+        .payment-option.selected {
+            border-color: #2d5f8d;
+            background: #f0f5f9;
+        }
+
+        .payment-option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .payment-option-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .payment-option-fee {
+            font-size: 13px;
+            color: #2d5f8d;
+            font-weight: 600;
+        }
+
+        .payment-option-desc {
+            font-size: 13px;
+            color: #536471;
+        }
+
+        /* Charitable Impact Box */
+        .impact-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f2 100%);
+            border: 2px solid #2d5f8d;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .impact-box h4 {
+            color: #2d5f8d;
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .impact-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(45, 95, 141, 0.2);
+        }
+
+        .impact-row:last-child {
+            border-bottom: none;
+        }
+
+        .impact-label {
+            color: #0f1419;
+            font-size: 14px;
+        }
+
+        .impact-value {
+            font-weight: 600;
+            color: #0f1419;
+            font-size: 14px;
+        }
+
+        .charitable-highlight {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .charitable-highlight .label {
+            font-size: 13px;
+            color: #536471;
+            margin-bottom: 8px;
+        }
+
+        .charitable-highlight .amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d5f8d;
+        }
+
+        /* Preferences Section */
+        .preference-item {
+            margin-bottom: 32px;
+        }
+
+        .preference-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .preference-label {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .preference-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d5f8d;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e1e8ed;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #2d5f8d;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #2d5f8d;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .slider-hint {
+            font-size: 12px;
+            color: #536471;
+            margin-top: 8px;
+        }
+
+        /* Category Selection */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .category-item {
+            padding: 16px;
+            border: 2px solid #cfd9de;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-item:hover {
+            border-color: #2d5f8d;
+            background: #f8fafc;
+        }
+
+        .category-item.selected {
+            border-color: #2d5f8d;
+            background: #f0f5f9;
+        }
+
+        .category-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cfd9de;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .category-item.selected .category-checkbox {
+            background: #2d5f8d;
+            border-color: #2d5f8d;
+        }
+
+        .category-info {
+            flex: 1;
+        }
+
+        .category-name {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        .category-desc {
+            font-size: 12px;
+            color: #536471;
+        }
+
+        /* Transaction History */
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .transaction-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2d5f8d;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .transaction-icon.received {
+            background: #10b981;
+        }
+
+        .transaction-details h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .transaction-details p {
+            font-size: 13px;
+            color: #536471;
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .transaction-amount .amount {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .transaction-amount.sent .amount {
+            color: #dc2626;
+        }
+
+        .transaction-amount.received .amount {
+            color: #10b981;
+        }
+
+        .transaction-amount .impact {
+            font-size: 11px;
+            color: #2d5f8d;
+            margin-top: 2px;
+        }
+
+        /* Button */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: #2d5f8d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #1a3a52;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d5f8d;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #536471;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #fff9e6;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            color: #92400e;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tabs-content {
+                overflow-x: auto;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1 style="color: #2d5f8d; font-size: 28px; font-weight: 700; margin: 0;">Reclaim Financial</h1>
+            </div>
+            <div class="header-info">
+                <div class="balance-display">Available Balance</div>
+                <div class="balance-amount">$1,247.50</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <div class="nav-tabs-content">
+            <div class="nav-tab active" onclick="switchTab('send')">Send Money</div>
+            <div class="nav-tab" onclick="switchTab('request')">Request Money</div>
+            <div class="nav-tab" onclick="switchTab('activity')">Activity</div>
+            <div class="nav-tab" onclick="switchTab('preferences')">Charitable Preferences</div>
+            <div class="nav-tab" onclick="switchTab('impact')">My Impact</div>
+            <div class="nav-tab" onclick="switchTab('story')">Our Story</div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- SEND MONEY SECTION -->
+        <div id="send-section" class="content-section active">
+            <div class="two-column">
+                <!-- Payment Form -->
+                <div class="card">
+                    <h3>Send Payment</h3>
+                    
+                    <div class="form-group">
+                        <label>Send to</label>
+                        <input type="text" placeholder="Email, phone, or @username" value="john.doe@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <div class="amount-input-wrapper">
+                            <input type="number" id="sendAmount" placeholder="0.00" value="100.00" oninput="calculateSendImpact()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What's this for?</label>
+                        <input type="text" placeholder="Dinner, rent, gift..." value="Dinner last night">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <div class="payment-methods">
+                            <div class="payment-option selected" onclick="selectSendPayment('balance')">
+                                <div class="payment-option-header">
+                                    <span class="payment-option-name">💳 Balance</span>
+                                    <span class="payment-option-fee">FREE</span>
+                                </div>
+                                <div class="payment-option-desc">$1,247.50 available</div>
+                            </div>
+
+                            <div class="payment-option" onclick="selectSendPayment('bank')">
+                                <div class="payment-option-header">
+                                    <span class="payment-option-name">🏦 Bank</span>
+                                    <span class="payment-option-fee">FREE</span>
+                                </div>
+                                <div class="payment-option-desc">Chase ****4567</div>
+                            </div>
+
+                            <div class="payment-option" onclick="selectSendPayment('debit')">
+                                <div class="payment-option-header">
+                                    <span class="payment-option-name">💳 Debit</span>
+                                    <span class="payment-option-fee">FREE</span>
+                                </div>
+                                <div class="payment-option-desc">Visa ****8901</div>
+                            </div>
+
+                            <div class="payment-option" onclick="selectSendPayment('credit')">
+                                <div class="payment-option-header">
+                                    <span class="payment-option-name">💎 Credit</span>
+                                    <span class="payment-option-fee">3.0%</span>
+                                </div>
+                                <div class="payment-option-desc">Mastercard ****2345</div>
+                            </div>
+
+                            <div class="payment-option" onclick="selectSendPayment('instant')">
+                                <div class="payment-option-header">
+                                    <span class="payment-option-name">⚡ Instant</span>
+                                    <span class="payment-option-fee">1.75%</span>
+                                </div>
+                                <div class="payment-option-desc">Arrives in minutes</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary">Send $<span id="sendTotal">100.00</span></button>
+                </div>
+
+                <!-- Impact Display -->
+                <div class="card">
+                    <h3>Transaction Impact</h3>
+                    
+                    <div class="info-box">
+                        <p><strong>Demo Note:</strong> This shows how fees generate charitable donations. Free transfers have no fees, so no charitable impact for that transaction.</p>
+                    </div>
+
+                    <div class="impact-box">
+                        <h4>💚 Charitable Impact</h4>
+                        
+                        <div class="impact-row">
+                            <span class="impact-label">Payment Amount</span>
+                            <span class="impact-value" id="sendPaymentAmount">$100.00</span>
+                        </div>
+                        <div class="impact-row">
+                            <span class="impact-label">Transaction Fee</span>
+                            <span class="impact-value" id="sendFeeAmount">$0.00</span>
+                        </div>
+                        <div class="impact-row">
+                            <span class="impact-label">You Pay Total</span>
+                            <span class="impact-value" id="sendTotalAmount">$100.00</span>
+                        </div>
+
+                        <div class="charitable-highlight">
+                            <div class="label">From this fee, we'll donate</div>
+                            <div class="amount" id="sendCharitableAmount">$0.00</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                        <div style="font-size: 13px; color: #536471; margin-bottom: 8px;">Your charitable preferences:</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            <span style="padding: 6px 12px; background: #2d5f8d; color: white; border-radius: 16px; font-size: 12px;">Education</span>
+                            <span style="padding: 6px 12px; background: #2d5f8d; color: white; border-radius: 16px; font-size: 12px;">Poverty Relief</span>
+                            <span style="padding: 6px 12px; background: #2d5f8d; color: white; border-radius: 16px; font-size: 12px;">Healthcare</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REQUEST MONEY SECTION -->
+        <div id="request-section" class="content-section">
+            <div class="two-column">
+                <div class="card">
+                    <h3>Request Payment</h3>
+                    
+                    <div class="form-group">
+                        <label>Request from</label>
+                        <input type="text" placeholder="Email, phone, or @username" value="sarah.smith@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <div class="amount-input-wrapper">
+                            <input type="number" placeholder="0.00" value="50.00">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What's this for?</label>
+                        <textarea rows="3" placeholder="Concert tickets, lunch, etc...">Your share of concert tickets</textarea>
+                    </div>
+
+                    <button class="btn-primary">Send Request</button>
+                </div>
+
+                <div class="card">
+                    <h3>Recent Requests</h3>
+                    
+                    <div class="transaction-list">
+                        <div class="transaction-item">
+                            <div class="transaction-left">
+                                <div class="transaction-icon">📨</div>
+                                <div class="transaction-details">
+                                    <h4>Mike Johnson</h4>
+                                    <p>Pizza delivery</p>
+                                </div>
+                            </div>
+                            <div class="transaction-amount">
+                                <div class="amount" style="color: #f59e0b;">Pending</div>
+                                <p style="font-size: 13px; color: #536471;">$25.00</p>
+                            </div>
+                        </div>
+
+                        <div class="transaction-item">
+                            <div class="transaction-left">
+                                <div class="transaction-icon received">✓</div>
+                                <div class="transaction-details">
+                                    <h4>Emma Davis</h4>
+                                    <p>Movie tickets</p>
+                                </div>
+                            </div>
+                            <div class="transaction-amount received">
+                                <div class="amount">+$30.00</div>
+                                <p style="font-size: 13px; color: #536471;">2 days ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIVITY SECTION -->
+        <div id="activity-section" class="content-section">
+            <div class="card">
+                <h3>Recent Activity</h3>
+                
+                <div class="transaction-list">
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">↗</div>
+                            <div class="transaction-details">
+                                <h4>John Doe</h4>
+                                <p>Dinner last night • Credit Card</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount sent">
+                            <div class="amount">-$103.00</div>
+                            <div class="impact">💚 $1.05 donated</div>
+                        </div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-icon received">↙</div>
+                            <div class="transaction-details">
+                                <h4>Sarah Smith</h4>
+                                <p>Rent payment</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount received">
+                            <div class="amount">+$850.00</div>
+                            <div class="impact">Free transfer</div>
+                        </div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">↗</div>
+                            <div class="transaction-details">
+                                <h4>Coffee Shop</h4>
+                                <p>Morning coffee • Debit Card</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount sent">
+                            <div class="amount">-$5.50</div>
+                            <div class="impact">Free transfer</div>
+                        </div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">↗</div>
+                            <div class="transaction-details">
+                                <h4>Mike Johnson</h4>
+                                <p>Concert tickets • Instant Transfer</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount sent">
+                            <div class="amount">-$151.75</div>
+                            <div class="impact">💚 $0.92 donated</div>
+                        </div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-icon received">↙</div>
+                            <div class="transaction-details">
+                                <h4>Emma Davis</h4>
+                                <p>Movie tickets reimbursement</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount received">
+                            <div class="amount">+$30.00</div>
+                            <div class="impact">Free transfer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PREFERENCES SECTION -->
+        <div id="preferences-section" class="content-section">
+            <div class="card">
+                <h3>Charitable Giving Preferences</h3>
+                
+                <div class="info-box">
+                    <p><strong>How it works:</strong> 35% of transaction fees always go to charity. You choose which causes to support and how to split that 35% among them using the sliders below.</p>
+                </div>
+
+                <h4 style="margin-bottom: 16px; font-size: 16px;">Select Charitable Categories</h4>
+                <div class="category-grid">
+                    <div class="category-item selected" onclick="toggleCategory(this, 'education')">
+                        <div class="category-checkbox">✓</div>
+                        <div class="category-info">
+                            <div class="category-name">Education</div>
+                            <div class="category-desc">Schools, scholarships, literacy programs</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item selected" onclick="toggleCategory(this, 'poverty')">
+                        <div class="category-checkbox">✓</div>
+                        <div class="category-info">
+                            <div class="category-name">Poverty Relief</div>
+                            <div class="category-desc">Food banks, housing, job training</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item selected" onclick="toggleCategory(this, 'healthcare')">
+                        <div class="category-checkbox">✓</div>
+                        <div class="category-info">
+                            <div class="category-name">Healthcare</div>
+                            <div class="category-desc">Medical access, mental health, clinics</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" onclick="toggleCategory(this, 'environment')">
+                        <div class="category-checkbox"></div>
+                        <div class="category-info">
+                            <div class="category-name">Environment</div>
+                            <div class="category-desc">Conservation, clean energy, climate</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" onclick="toggleCategory(this, 'equity')">
+                        <div class="category-checkbox"></div>
+                        <div class="category-info">
+                            <div class="category-name">Social Equity</div>
+                            <div class="category-desc">Civil rights, justice reform, equality</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" onclick="toggleCategory(this, 'community')">
+                        <div class="category-checkbox"></div>
+                        <div class="category-info">
+                            <div class="category-name">Community Development</div>
+                            <div class="category-desc">Infrastructure, local programs, arts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #e1e8ed; margin: 32px 0;">
+
+                <div id="allocation-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h4 style="font-size: 16px; margin: 0;">Allocate Your 35% Charitable Contribution</h4>
+                        <span id="total-percentage" style="font-size: 18px; font-weight: 700; color: #2d5f8d;">100%</span>
+                    </div>
+                    <p style="font-size: 13px; color: #536471; margin-bottom: 24px;">Adjust the sliders to decide how much of your charitable contribution goes to each cause. Must total 100%.</p>
+
+                    <div id="sliders-container">
+                        <!-- Sliders will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <button class="btn-primary" style="margin-top: 24px;">Save Preferences</button>
+            </div>
+        </div>
+
+        <!-- IMPACT SECTION -->
+        <div id="impact-section" class="content-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">$127.43</div>
+                    <div class="stat-label">Total Donated</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">Transactions with Impact</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Causes Supported</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Your Charitable Impact Breakdown</h3>
+                
+                <div style="margin: 24px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px; color: #0f1419; font-weight: 600;">Education</span>
+                        <span style="font-size: 14px; font-weight: 600; color: #2d5f8d;">$52.34</span>
+                    </div>
+                    <div style="width: 100%; height: 12px; background: #e1e8ed; border-radius: 6px; overflow: hidden;">
+                        <div style="width: 41%; height: 100%; background: #2d5f8d;"></div>
+                    </div>
+                </div>
+
+                <div style="margin: 24px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px; color: #0f1419; font-weight: 600;">Poverty Relief</span>
+                        <span style="font-size: 14px; font-weight: 600; color: #2d5f8d;">$45.67</span>
+                    </div>
+                    <div style="width: 100%; height: 12px; background: #e1e8ed; border-radius: 6px; overflow: hidden;">
+                        <div style="width: 36%; height: 100%; background: #10b981;"></div>
+                    </div>
+                </div>
+
+                <div style="margin: 24px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 14px; color: #0f1419; font-weight: 600;">Healthcare</span>
+                        <span style="font-size: 14px; font-weight: 600; color: #2d5f8d;">$29.42</span>
+                    </div>
+                    <div style="width: 100%; height: 12px; background: #e1e8ed; border-radius: 6px; overflow: hidden;">
+                        <div style="width: 23%; height: 100%; background: #f59e0b;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px; padding: 20px; background: #f0f5f9; border-radius: 8px; text-align: center;">
+                    <p style="font-size: 14px; color: #536471; margin-bottom: 8px;">If you continue at this rate, in one year you'll donate</p>
+                    <p style="font-size: 32px; font-weight: 700; color: #2d5f8d;">$815.00</p>
+                    <p style="font-size: 13px; color: #536471; margin-top: 8px;">Just by using Reclaim Financial for your everyday payments</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 24px;">
+                <h3>Recent Charitable Distributions</h3>
+                <p style="font-size: 14px; color: #536471; margin-bottom: 20px;">Organizations that received donations from your fees this quarter</p>
+                
+                <div class="transaction-list">
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-icon" style="background: #10b981;">🎓</div>
+                            <div class="transaction-details">
+                                <h4>Local Schools Foundation</h4>
+                                <p>Education • Verified 501(c)(3)</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount" style="color: #2d5f8d;">$52.34</div>
+                            <p style="font-size: 11px; color: #536471;">From your fees</p>
+                        </div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-icon" style="background: #10b981;">🍽️</div>
+                            <div class="transaction-details">
+                                <h4>Community Food Bank</h4>
+                                <p>Poverty Relief • Verified 501(c)(3)</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount" style="color: #2d5f8d;">$45.67</div>
+                            <p style="font-size: 11px; color: #536471;">From your fees</p>
+                        </div>
+                    </div>
+
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-icon" style="background: #10b981;">🏥</div>
+                            <div class="transaction-details">
+                                <h4>Free Health Clinic Network</h4>
+                                <p>Healthcare • Verified 501(c)(3)</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount" style="color: #2d5f8d;">$29.42</div>
+                            <p style="font-size: 11px; color: #536471;">From your fees</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STORY SECTION -->
+        <div id="story-section" class="content-section">
+            <div class="card">
+                <h2 style="font-size: 32px; margin-bottom: 24px; color: #2d5f8d;">Help Us Build Banking That Gives Back</h2>
+                
+                <p style="font-size: 18px; line-height: 1.8; margin-bottom: 32px;">We're creating the first nonprofit payment platform that turns everyday transactions into charitable impact.</p>
+
+                <h3 style="font-size: 24px; margin: 32px 0 16px; color: #0f1419;">The Problem</h3>
+                <p style="line-height: 1.8; margin-bottom: 24px;">Every time you send money on Venmo, use Cash App, or pay with PayPal, those companies make a profit. Billions of dollars flow through payment platforms each year, generating massive profits for shareholders and executives.</p>
+                <p style="line-height: 1.8; margin-bottom: 24px; font-weight: 600; font-size: 18px;">What if those profits could help communities instead?</p>
+
+                <h3 style="font-size: 24px; margin: 32px 0 16px; color: #0f1419;">Our Solution: Reclaim Financial</h3>
+                <p style="line-height: 1.8; margin-bottom: 16px;">Reclaim Financial is a nonprofit payment platform that works exactly like Venmo, Cash App, or PayPal, with one crucial difference:</p>
+                <p style="line-height: 1.8; margin-bottom: 16px; font-weight: 600;">Instead of enriching shareholders, we automatically convert profits into charitable donations.</p>
+                
+                <ul style="line-height: 2; margin: 24px 0 24px 20px;">
+                    <li>Same free P2P transfers you're used to</li>
+                    <li>Same convenience and security as major platforms</li>
+                    <li>Same optional instant transfer fees (1.75%)</li>
+                    <li><strong>But 35% of all revenue goes directly to verified charities</strong></li>
+                </ul>
+
+                <p style="line-height: 1.8; margin-bottom: 24px;">You won't pay extra. You won't change how you use money. Just by banking with Reclaim instead of a for-profit company, you'll automatically generate $55 to $93 in charitable giving every year.</p>
+
+                <h3 style="font-size: 24px; margin: 32px 0 16px; color: #0f1419;">How It Works</h3>
+                
+                <h4 style="font-size: 18px; margin: 24px 0 12px; color: #2d5f8d;">REVENUE SOURCES (Just Like Other Platforms):</h4>
+                <ol style="line-height: 2; margin: 16px 0 24px 20px;">
+                    <li><strong>Standard transfers:</strong> FREE (builds our user base)</li>
+                    <li><strong>Instant transfers:</strong> 1.75% optional fee (if you want money immediately)</li>
+                    <li><strong>Credit card payments:</strong> 3% fee (when users choose credit cards)</li>
+                    <li><strong>Debit card interchange:</strong> around 0.6% (merchants pay this, not you)</li>
+                    <li><strong>Business accounts:</strong> 2.9% + $0.30 (competitive with PayPal)</li>
+                </ol>
+
+                <h4 style="font-size: 18px; margin: 24px 0 12px; color: #2d5f8d;">EVERY DOLLAR OF REVENUE SPLITS:</h4>
+                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 16px 0 24px;">
+                    <p style="line-height: 1.8; margin-bottom: 8px;"><strong>65%</strong> goes to Operations (fair salaries, technology, compliance, security)</p>
+                    <p style="line-height: 1.8;"><strong>35%</strong> goes to Charitable Giving (verified 501(c)(3) organizations)</p>
+                </div>
+
+                <h4 style="font-size: 18px; margin: 24px 0 12px; color: #2d5f8d;">OUR COMMITMENT:</h4>
+                <ul style="line-height: 2; margin: 16px 0 24px 20px;">
+                    <li><strong>Maximum salary:</strong> $81,250 (no executive excess. No one gets rich)</li>
+                    <li><strong>Complete transparency</strong> (quarterly public reports)</li>
+                    <li><strong>Community votes</strong> on charitable recipients</li>
+                    <li><strong>Open financial records</strong> (you see where every dollar goes)</li>
+                </ul>
+
+                <h3 style="font-size: 24px; margin: 32px 0 16px; color: #0f1419;">Why This Will Succeed</h3>
+                
+                <h4 style="font-size: 18px; margin: 24px 0 12px; color: #2d5f8d;">WE'RE NOT ASKING USERS TO PAY MORE</h4>
+                <p style="line-height: 1.8; margin-bottom: 24px;">Our pricing matches Venmo and Cash App exactly. People switch because they want their financial activity to create social good, not because we're cheaper or more expensive.</p>
+
+                <h4 style="font-size: 18px; margin: 24px 0 12px; color: #2d5f8d;">WE'RE USING A PROVEN BUSINESS MODEL</h4>
+                <p style="line-height: 1.8; margin-bottom: 24px;">This is exactly how Cash App, Venmo, and PayPal make billions. We're just redirecting those profits to communities instead of investors.</p>
+
+                <h4 style="font-size: 18px; margin: 24px 0 12px; color: #2d5f8d;">PEOPLE WANT THIS</h4>
+                <p style="line-height: 1.8; margin-bottom: 24px;">More and more consumers are seeking ways to align their spending with their values. We're giving them a way to do it effortlessly, every day.</p>
+
+                <div style="background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f2 100%); padding: 32px; border-radius: 12px; margin: 40px 0; text-align: center;">
+                    <h3 style="font-size: 28px; margin-bottom: 16px; color: #2d5f8d;">The Big Picture</h3>
+                    <p style="font-size: 18px; line-height: 1.8; margin-bottom: 16px;"><strong>Banking doesn't have to extract wealth. It can create community wealth.</strong></p>
+                    <p style="line-height: 1.8;">When we succeed with Reclaim Financial, we'll demonstrate that fair wages and transparency are sustainable, that consumers will choose ethical alternatives, that everyday transactions can fund social good, and that the nonprofit model works for fintech.</p>
+                </div>
+
+                <h3 style="font-size: 24px; margin: 32px 0 16px; color: #0f1419;">Transparency Promise</h3>
+                <p style="line-height: 1.8; margin-bottom: 16px;">Every quarter, we'll publish detailed reports showing:</p>
+                <ul style="line-height: 2; margin: 16px 0 24px 20px;">
+                    <li>Total users and transaction volume</li>
+                    <li>Revenue by source</li>
+                    <li>Operating costs (with full breakdown)</li>
+                    <li>Charitable distributions (every organization, every dollar)</li>
+                    <li>Salary information (every staff member)</li>
+                    <li>Progress toward goals</li>
+                </ul>
+                <p style="line-height: 1.8; margin-bottom: 32px;"><strong>You'll know exactly where your money goes and what impact it creates.</strong></p>
+
+                <div style="background: #2d5f8d; color: white; padding: 40px; border-radius: 12px; text-align: center;">
+                    <h3 style="font-size: 28px; margin-bottom: 16px;">Join the Movement</h3>
+                    <p style="font-size: 18px; line-height: 1.8; margin-bottom: 24px;">Help us prove that fairness can be engineered into finance.</p>
+                    <p style="line-height: 1.8; margin-bottom: 0;">Your contribution isn't just launching a payment platform. It's funding a proof of concept for ethical capitalism. You're investing in the idea that businesses can serve communities first and still be sustainable.</p>
+                </div>
+
+                <p style="text-align: center; margin-top: 40px; font-size: 14px; color: #536471;">Reclaim Financial is a 501(c)(3) nonprofit organization (pending). All donations support platform development and operational costs. We are committed to complete transparency and will provide regular updates on our progress.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSendMethod = 'balance';
+        
+        // Category allocations (as percentages that must sum to 100)
+        let categoryAllocations = {
+            'education': { name: 'Education', active: true, percentage: 33.33 },
+            'poverty': { name: 'Poverty Relief', active: true, percentage: 33.33 },
+            'healthcare': { name: 'Healthcare', active: true, percentage: 33.34 },
+            'environment': { name: 'Environment', active: false, percentage: 0 },
+            'equity': { name: 'Social Equity', active: false, percentage: 0 },
+            'community': { name: 'Community Development', active: false, percentage: 0 }
+        };
+
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(tabName + '-section').classList.add('active');
+            
+            // Activate clicked tab
+            event.target.classList.add('active');
+            
+            // If switching to preferences, update sliders
+            if (tabName === 'preferences') {
+                updateSliders();
+            }
+        }
+
+        // Payment Method Selection (Send)
+        function selectSendPayment(method) {
+            currentSendMethod = method;
+            
+            // Update UI
+            document.querySelectorAll('.payment-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            calculateSendImpact();
+        }
+
+        // Calculate Impact for Send Money
+        function calculateSendImpact() {
+            const amount = parseFloat(document.getElementById('sendAmount').value) || 0;
+            
+            let fee = 0;
+            let feeText = '$0.00 (Free)';
+
+            switch(currentSendMethod) {
+                case 'balance':
+                case 'bank':
+                case 'debit':
+                    fee = 0;
+                    break;
+                case 'credit':
+                    fee = amount * 0.03;
+                    feeText = `$${fee.toFixed(2)} (3%)`;
+                    break;
+                case 'instant':
+                    fee = amount * 0.0175;
+                    feeText = `$${fee.toFixed(2)} (1.75%)`;
+                    break;
+            }
+
+            const total = amount + fee;
+            const charitable = fee * 0.35; // Always 35% of fees
+
+            document.getElementById('sendPaymentAmount').textContent = `$${amount.toFixed(2)}`;
+            document.getElementById('sendFeeAmount').textContent = feeText;
+            document.getElementById('sendTotalAmount').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('sendCharitableAmount').textContent = `$${charitable.toFixed(2)}`;
+            document.getElementById('sendTotal').textContent = total.toFixed(2);
+        }
+
+        // Toggle Category Selection
+        function toggleCategory(element, categoryId) {
+            element.classList.toggle('selected');
+            const checkbox = element.querySelector('.category-checkbox');
+            
+            categoryAllocations[categoryId].active = element.classList.contains('selected');
+            
+            if (element.classList.contains('selected')) {
+                checkbox.textContent = '✓';
+            } else {
+                checkbox.textContent = '';
+                categoryAllocations[categoryId].percentage = 0;
+            }
+            
+            // Redistribute percentages equally among active categories
+            redistributePercentages();
+            updateSliders();
+        }
+
+        // Redistribute percentages equally among active categories
+        function redistributePercentages() {
+            const activeCategories = Object.keys(categoryAllocations).filter(
+                key => categoryAllocations[key].active
+            );
+            
+            if (activeCategories.length === 0) return;
+            
+            const equalShare = 100 / activeCategories.length;
+            
+            activeCategories.forEach((key, index) => {
+                // Add extra to last category to ensure exactly 100%
+                if (index === activeCategories.length - 1) {
+                    const sum = activeCategories.slice(0, -1).reduce(
+                        (acc, k) => acc + Math.floor(equalShare * 100) / 100, 0
+                    );
+                    categoryAllocations[key].percentage = Math.round((100 - sum) * 100) / 100;
+                } else {
+                    categoryAllocations[key].percentage = Math.floor(equalShare * 100) / 100;
+                }
+            });
+        }
+
+        // Update sliders display
+        function updateSliders() {
+            const container = document.getElementById('sliders-container');
+            container.innerHTML = '';
+            
+            const activeCategories = Object.keys(categoryAllocations).filter(
+                key => categoryAllocations[key].active
+            );
+            
+            if (activeCategories.length === 0) {
+                container.innerHTML = '<p style="color: #536471; text-align: center; padding: 20px;">Select at least one category above to allocate your charitable contributions.</p>';
+                return;
+            }
+            
+            activeCategories.forEach(categoryId => {
+                const category = categoryAllocations[categoryId];
+                
+                const sliderDiv = document.createElement('div');
+                sliderDiv.className = 'preference-item';
+                sliderDiv.innerHTML = `
+                    <div class="preference-header">
+                        <span class="preference-label">${category.name}</span>
+                        <span class="preference-value" id="${categoryId}-value">${category.percentage.toFixed(1)}%</span>
+                    </div>
+                    <input type="range" 
+                           min="0" 
+                           max="100" 
+                           step="0.1"
+                           value="${category.percentage}" 
+                           class="slider" 
+                           id="${categoryId}-slider" 
+                           oninput="updateCategoryAllocation('${categoryId}', this.value)">
+                `;
+                
+                container.appendChild(sliderDiv);
+            });
+            
+            updateTotalPercentage();
+        }
+
+        // Update category allocation when slider moves
+        function updateCategoryAllocation(categoryId, value) {
+            const newValue = parseFloat(value);
+            const oldValue = categoryAllocations[categoryId].percentage;
+            const difference = newValue - oldValue;
+            
+            categoryAllocations[categoryId].percentage = newValue;
+            
+            // Get other active categories
+            const otherActive = Object.keys(categoryAllocations).filter(
+                key => categoryAllocations[key].active && key !== categoryId
+            );
+            
+            if (otherActive.length > 0) {
+                // Distribute the difference among other categories proportionally
+                const otherTotal = otherActive.reduce(
+                    (sum, key) => sum + categoryAllocations[key].percentage, 0
+                );
+                
+                if (otherTotal > 0) {
+                    otherActive.forEach(key => {
+                        const proportion = categoryAllocations[key].percentage / otherTotal;
+                        categoryAllocations[key].percentage = Math.max(0, 
+                            categoryAllocations[key].percentage - (difference * proportion)
+                        );
+                    });
+                }
+                
+                // Normalize to ensure exactly 100%
+                normalizePercentages();
+            }
+            
+            // Update all slider displays
+            Object.keys(categoryAllocations).forEach(key => {
+                if (categoryAllocations[key].active) {
+                    const valueElement = document.getElementById(key + '-value');
+                    const sliderElement = document.getElementById(key + '-slider');
+                    if (valueElement && sliderElement) {
+                        valueElement.textContent = categoryAllocations[key].percentage.toFixed(1) + '%';
+                        sliderElement.value = categoryAllocations[key].percentage;
+                    }
+                }
+            });
+            
+            updateTotalPercentage();
+        }
+
+        // Normalize percentages to exactly 100%
+        function normalizePercentages() {
+            const activeCategories = Object.keys(categoryAllocations).filter(
+                key => categoryAllocations[key].active
+            );
+            
+            const total = activeCategories.reduce(
+                (sum, key) => sum + categoryAllocations[key].percentage, 0
+            );
+            
+            if (total !== 100 && activeCategories.length > 0) {
+                const adjustmentFactor = 100 / total;
+                let sum = 0;
+                
+                activeCategories.forEach((key, index) => {
+                    if (index === activeCategories.length - 1) {
+                        // Last category gets remainder to ensure exactly 100%
+                        categoryAllocations[key].percentage = Math.round((100 - sum) * 10) / 10;
+                    } else {
+                        categoryAllocations[key].percentage = Math.round(
+                            categoryAllocations[key].percentage * adjustmentFactor * 10
+                        ) / 10;
+                        sum += categoryAllocations[key].percentage;
+                    }
+                });
+            }
+        }
+
+        // Update total percentage display
+        function updateTotalPercentage() {
+            const total = Object.keys(categoryAllocations)
+                .filter(key => categoryAllocations[key].active)
+                .reduce((sum, key) => sum + categoryAllocations[key].percentage, 0);
+            
+            const totalElement = document.getElementById('total-percentage');
+            if (totalElement) {
+                totalElement.textContent = total.toFixed(1) + '%';
+                
+                // Visual feedback if not exactly 100%
+                if (Math.abs(total - 100) < 0.2) {
+                    totalElement.style.color = '#10b981'; // Green when correct
+                } else {
+                    totalElement.style.color = '#dc2626'; // Red when incorrect
+                }
+            }
+        }
+
+        // Initialize
+        calculateSendImpact();
+        updateSliders();
+    </script>
+</body>
+</html>
